@@ -1,0 +1,7 @@
+port: 8080
+log_level: info
+ble:
+  devices:
+    - name: living room sensor
+      model: LYWSD03MMC
+      address: A4:C1:38:64:49:02
