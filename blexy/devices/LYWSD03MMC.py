@@ -1,8 +1,6 @@
 from bluepy import btle
-from .abstract_device import AbstractDevice
-
-# import json
 from typing import List
+from blexy.devices.abstract_device import AbstractDevice
 
 
 class LYWSD03MMC(AbstractDevice):

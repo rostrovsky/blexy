@@ -1,7 +1,7 @@
+import json
 from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import List
 from bluepy import btle
-import json
 
 
 class AbstractDevice(btle.DefaultDelegate, metaclass=ABCMeta):
