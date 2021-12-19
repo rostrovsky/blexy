@@ -1,9 +1,11 @@
 from bluepy import btle
-import json
+from .abstract_device import AbstractDevice
+
+# import json
 from typing import List
 
 
-class LYWSD03MMC(btle.DefaultDelegate):
+class LYWSD03MMC(AbstractDevice):
     model = "LYWSD03MMC"
     manufacturer = "Xiaomi"
 
@@ -20,9 +22,6 @@ class LYWSD03MMC(btle.DefaultDelegate):
         self.battery_level = None
 
         self.peripheral = btle.Peripheral(deviceAddr=None, iface=self.interface)
-
-    def as_dict(self) -> dict:
-        return json.loads(json.dumps(vars(self), default=repr))
 
     def connect(self):
         print(f"Connecting {self.name} ({self.model})")
@@ -48,10 +47,6 @@ class LYWSD03MMC(btle.DefaultDelegate):
             )  # 3.1 or above --> 100% 2.1 --> 0 %
         except Exception as e:
             print("e")
-
-    @property
-    def _open_metrics_labels(self) -> str:
-        return f'{{name="{self.name}",model="{self.model}",manufacturer="{self.manufacturer}",address="{self.address}",interface="{self.interface}"}}'
 
     @property
     def open_metrics(self) -> List[str]:

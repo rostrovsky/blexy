@@ -7,6 +7,7 @@ import uvicorn
 
 connected_devices = []
 
+# read and parse config file
 with open("config.yaml", "r") as cf:
     config = yaml.load(cf, yaml.SafeLoader)
     port = config.get("port")
@@ -15,11 +16,17 @@ with open("config.yaml", "r") as cf:
 
 
 async def homepage(request):
-    devices = [d.as_dict() for d in connected_devices]
+    """
+    Returns JSON with list of connected devices
+    """
+    devices = [d.as_dict for d in connected_devices]
     return JSONResponse(devices)
 
 
 async def metrics(request):
+    """
+    Returns device readouts in OpenMetrics format
+    """
     out = []
     for d in connected_devices:
         if d.peripheral.waitForNotifications(2000):
@@ -35,8 +42,7 @@ app = Starlette(
     ],
 )
 
-print("hmm")
-
+# connect devices
 for dev in config_devices:
     dev_name = dev.get("name")
     dev_model = dev.get("model")
