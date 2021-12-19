@@ -15,6 +15,7 @@ def cli(port, config_file, log_level):
     GlobalConfig.load_from_file(config_file)
     app_port = port if port else GlobalConfig.port
     app_log_level = log_level if log_level else GlobalConfig.log_level
+    GlobalConfig.connect_all_devices()
     uvicorn.run(blexy.app.app, host="0.0.0.0", port=app_port, log_level=app_log_level)
 
 

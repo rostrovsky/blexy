@@ -1,6 +1,10 @@
+from abc import abstractproperty
 from pathlib import Path
 from importlib import import_module
+from typing import List
 import yaml
+
+from blexy.devices.abstract_device import AbstractDevice
 
 with open("config.yaml", "r") as cf:
     config = yaml.load(cf, yaml.SafeLoader)
@@ -13,7 +17,7 @@ class GlobalConfig:
     port = None
     log_level = None
     devices = None
-    device_objects = None
+    _device_objects = None
 
     @staticmethod
     def load_from_file(file_path: str) -> "GlobalConfig":
@@ -25,7 +29,7 @@ class GlobalConfig:
             GlobalConfig.devices = config.get("ble").get("devices")
 
         if GlobalConfig.devices:
-            GlobalConfig.device_objects = []
+            GlobalConfig._device_objects = []
 
         for dev in GlobalConfig.devices:
             dev_name = dev.get("name")
@@ -38,7 +42,16 @@ class GlobalConfig:
                 device_obj = device_class(
                     name=dev_name, address=dev_addr, interface=dev_iface
                 )
-                GlobalConfig.device_objects.append(device_obj)
+                GlobalConfig._device_objects.append(device_obj)
             except Exception as e:
                 print(f'could not import device "{dev_name}" ({dev_model})')
                 print(e)
+
+    @staticmethod
+    def connected_devices() -> List[AbstractDevice]:
+        return [d for d in GlobalConfig._device_objects if d.is_connected]
+
+    @staticmethod
+    def connect_all_devices():
+        for d in GlobalConfig._device_objects:
+            d.connect()
