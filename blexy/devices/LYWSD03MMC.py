@@ -8,13 +8,7 @@ class LYWSD03MMC(AbstractDevice):
     manufacturer = "Xiaomi"
 
     def __init__(self, name, address, interface) -> None:
-        super().__init__()
-
-        self.name = name
-        self.address = address
-        self.interface = interface
-        self.peripheral = btle.Peripheral(deviceAddr=None, iface=self.interface)
-        self.is_connected = False
+        super().__init__(name, address, interface)
 
         self.temperature = None
         self.humidity = None

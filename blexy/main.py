@@ -3,8 +3,6 @@ import uvicorn
 import blexy.app
 from blexy.utils.config import GlobalConfig
 
-connected_devices = []
-
 
 @click.command()
 @click.help_option("-h", "--help")
