@@ -18,7 +18,7 @@ async def metrics(request):
     """
     out = []
     for d in GlobalConfig.connected_devices():
-        if d.peripheral.waitForNotifications(2000):
+        if d.peripheral.waitForNotifications(5):
             out.extend(d.open_metrics)
     return PlainTextResponse("\n".join(out))
 
