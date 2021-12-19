@@ -1,61 +1,22 @@
-from starlette.applications import Starlette
-from starlette.responses import JSONResponse, PlainTextResponse
-from starlette.routing import Route
-from importlib import import_module
-import yaml
+import click
 import uvicorn
+import blexy.app
+from blexy.utils.config import GlobalConfig
 
 connected_devices = []
 
-# read and parse config file
-with open("config.yaml", "r") as cf:
-    config = yaml.load(cf, yaml.SafeLoader)
-    port = config.get("port")
-    log_level = config.get("log_level")
-    config_devices = config.get("ble").get("devices")
 
+@click.command()
+@click.help_option("-h", "--help")
+@click.option("-p", "--port", type=click.INT)
+@click.option("-c", "--config-file", default="./config.yaml", show_default=True)
+@click.option("--log-level")
+def cli(port, config_file, log_level):
+    GlobalConfig.load_from_file(config_file)
+    app_port = port if port else GlobalConfig.port
+    app_log_level = log_level if log_level else GlobalConfig.log_level
+    uvicorn.run(blexy.app.app, host="0.0.0.0", port=app_port, log_level=app_log_level)
 
-async def homepage(request):
-    """
-    Returns JSON with list of connected devices
-    """
-    devices = [d.as_dict for d in connected_devices]
-    return JSONResponse(devices)
-
-
-async def metrics(request):
-    """
-    Returns device readouts in OpenMetrics format
-    """
-    out = []
-    for d in connected_devices:
-        if d.peripheral.waitForNotifications(2000):
-            out.extend(d.open_metrics)
-    return PlainTextResponse("\n".join(out))
-
-
-app = Starlette(
-    debug=True,
-    routes=[
-        Route("/", homepage),
-        Route("/metrics", metrics),
-    ],
-)
-
-# connect devices
-for dev in config_devices:
-    dev_name = dev.get("name")
-    dev_model = dev.get("model")
-    dev_addr = dev.get("address")
-    dev_iface = dev.get("interface", 0)
-    try:
-        device_module = import_module(f"devices.{dev_model}")
-        device_class = getattr(device_module, dev_model)
-        device_obj = device_class(name=dev_name, address=dev_addr, interface=dev_iface)
-        connected_devices.append(device_obj.connect())
-    except Exception as e:
-        print(f'could not import device "{dev_name}" ({dev_model})')
-        print(e)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=port, log_level=log_level)
+    cli()
