@@ -1,8 +1,6 @@
 from bluepy import btle
-from .abstract_device import AbstractDevice
-
-# import json
 from typing import List
+from blexy.devices.abstract_device import AbstractDevice
 
 
 class LYWSD03MMC(AbstractDevice):
@@ -10,20 +8,17 @@ class LYWSD03MMC(AbstractDevice):
     manufacturer = "Xiaomi"
 
     def __init__(self, name, address, interface) -> None:
-        super().__init__()
-
-        self.name = name
-        self.address = address
-        self.interface = interface
+        super().__init__(name, address, interface)
 
         self.temperature = None
         self.humidity = None
         self.voltage = None
         self.battery_level = None
 
-        self.peripheral = btle.Peripheral(deviceAddr=None, iface=self.interface)
-
     def connect(self):
+        if self.is_connected:
+            return self
+
         print(f"Connecting {self.name} ({self.model})")
         self.peripheral.connect(self.address)
         self.peripheral.writeCharacteristic(
@@ -32,6 +27,7 @@ class LYWSD03MMC(AbstractDevice):
         self.peripheral.writeCharacteristic(0x0046, b"\xf4\x01\x00", True)
         self.peripheral.withDelegate(self)
         print(f"Connected {self.name} ({self.model})")
+        self.is_connected = True
         return self
 
     def handleNotification(self, cHandle, data):

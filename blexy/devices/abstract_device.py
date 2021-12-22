@@ -1,10 +1,18 @@
+import json
 from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import List
 from bluepy import btle
-import json
 
 
 class AbstractDevice(btle.DefaultDelegate, metaclass=ABCMeta):
+    def __init__(self, name, address, interface):
+        super().__init__()
+        self.name = name
+        self.address = address
+        self.interface = interface
+        self.peripheral = btle.Peripheral(deviceAddr=None, iface=self.interface)
+        self.is_connected = False
+
     @abstractmethod
     def connect(self) -> "AbstractDevice":
         pass
