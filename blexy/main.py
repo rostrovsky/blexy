@@ -10,6 +10,9 @@ from blexy.utils.config import GlobalConfig
 @click.option("-c", "--config-file", default="./config.yaml", show_default=True)
 @click.option("--log-level")
 def cli(port, config_file, log_level):
+    """
+    Simple OpenMetrics exporter for BLE devices.
+    """
     GlobalConfig.load_from_file(config_file)
     app_port = port if port else GlobalConfig.port
     app_log_level = log_level if log_level else GlobalConfig.log_level
