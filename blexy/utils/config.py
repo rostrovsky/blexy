@@ -6,12 +6,6 @@ import yaml
 
 from blexy.devices.abstract_device import AbstractDevice
 
-with open("config.yaml", "r") as cf:
-    config = yaml.load(cf, yaml.SafeLoader)
-    port = config.get("port")
-    log_level = config.get("log_level")
-    config_devices = config.get("ble").get("devices")
-
 
 class GlobalConfig:
     port = None
