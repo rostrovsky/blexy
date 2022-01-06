@@ -21,6 +21,9 @@ class AbstractDevice(btle.DefaultDelegate, metaclass=ABCMeta):
     def handleNotification(self, cHandle, data):
         pass
 
+    async def asyncWaitForNotifications(self, timeout) -> bool:
+        raise NotImplementedError("TODO!")
+
     @abstractmethod
     @property
     def open_metrics(self) -> List[str]:
