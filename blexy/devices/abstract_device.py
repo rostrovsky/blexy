@@ -1,5 +1,5 @@
 import json
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 from typing import List
 from bluepy import btle
 
@@ -21,7 +21,8 @@ class AbstractDevice(btle.DefaultDelegate, metaclass=ABCMeta):
     def handleNotification(self, cHandle, data):
         pass
 
-    @abstractproperty
+    @abstractmethod
+    @property
     def open_metrics(self) -> List[str]:
         pass
 
