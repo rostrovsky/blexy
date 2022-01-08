@@ -1,3 +1,4 @@
+import asyncio
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.routing import Route
@@ -17,9 +18,13 @@ async def metrics(request):
     Returns device readouts in OpenMetrics format
     """
     out = []
-    for d in GlobalConfig.connected_devices():
-        if d.peripheral.waitForNotifications(5):
-            out.extend(d.open_metrics)
+    tasks = [d.asyncWaitForNotifications(5) for d in GlobalConfig.connected_devices()]
+    results = await asyncio.gather(*tasks)
+    for success, device in results:
+        if success:
+            out.extend(device.open_metrics)
+    out.append("# EOF")
+
     return PlainTextResponse("\n".join(out))
 
 

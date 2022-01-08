@@ -1,7 +1,9 @@
 import json
 from abc import ABCMeta, abstractmethod
-from typing import List
+from typing import List, Tuple
 from bluepy import btle
+
+from blexy.utils.concurrency import run_in_executor
 
 
 class AbstractDevice(btle.DefaultDelegate, metaclass=ABCMeta):
@@ -21,11 +23,16 @@ class AbstractDevice(btle.DefaultDelegate, metaclass=ABCMeta):
     def handleNotification(self, cHandle, data):
         pass
 
-    async def asyncWaitForNotifications(self, timeout) -> bool:
-        raise NotImplementedError("TODO!")
+    @run_in_executor
+    def __asyncWaitForNotifications(self, timeout) -> Tuple[bool, "AbstractDevice"]:
+        return self.peripheral.waitForNotifications(timeout), self
 
-    @abstractmethod
+    async def asyncWaitForNotifications(self, timeout) -> Tuple[bool, "AbstractDevice"]:
+        print(f"{self.name} - waiting for notification with timeout {timeout}s")
+        return await self.__asyncWaitForNotifications(timeout), self
+
     @property
+    @abstractmethod
     def open_metrics(self) -> List[str]:
         pass
 
