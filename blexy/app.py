@@ -29,7 +29,6 @@ async def metrics(request):
 
 
 app = Starlette(
-    debug=True,
     routes=[
         Route("/", homepage),
         Route("/metrics", metrics),
