@@ -14,7 +14,7 @@ setup(
     license="MIT",
     packages=find_packages(),
     include_package_data=True,
-    install_requires=["click", "starlette", "pyyaml", "uvicorn", "bluepy"],
+    install_requires=["click", "starlette", "pyyaml", "uvicorn", "bluepy", "twiggy"],
     python_requires=">=3.6",
     entry_points={
         "console_scripts": [

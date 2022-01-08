@@ -2,6 +2,7 @@ import json
 from abc import ABCMeta, abstractmethod
 from typing import List, Tuple
 from bluepy import btle
+from twiggy import log
 
 from blexy.utils.concurrency import run_in_executor
 
@@ -14,6 +15,10 @@ class AbstractDevice(btle.DefaultDelegate, metaclass=ABCMeta):
         self.interface = interface
         self.peripheral = btle.Peripheral(deviceAddr=None, iface=self.interface)
         self.is_connected = False
+
+    @property
+    def log(self):
+        return log.name(f"{self.name}@{self.address}")
 
     @abstractmethod
     def connect(self) -> "AbstractDevice":
@@ -28,7 +33,7 @@ class AbstractDevice(btle.DefaultDelegate, metaclass=ABCMeta):
         return self.peripheral.waitForNotifications(timeout), self
 
     async def asyncWaitForNotifications(self, timeout) -> Tuple[bool, "AbstractDevice"]:
-        print(f"{self.name} - waiting for notification with timeout {timeout}s")
+        self.log.debug(f"waiting for notification with timeout {timeout}s")
         return await self.__asyncWaitForNotifications(timeout), self
 
     @property

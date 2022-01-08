@@ -2,6 +2,9 @@ import click
 import uvicorn
 import blexy.app
 from blexy.utils.config import GlobalConfig
+from twiggy import quick_setup
+
+quick_setup()
 
 
 @click.command()
