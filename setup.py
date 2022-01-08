@@ -9,7 +9,7 @@ setup(
     description="Simple OpenMetrics exporter for BLE devices",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version="0.1.0",
+    version="0.2.0",
     url="https://github.com/rostrovsky/blexy",
     license="MIT",
     packages=find_packages(),

@@ -31,5 +31,7 @@ ble:
       address: xx:xx:xx:xx:xx:xx
 ```
 
+## Output
+
 ## Supported devices
 * `LYWSD03MMC` (Xiaomi)

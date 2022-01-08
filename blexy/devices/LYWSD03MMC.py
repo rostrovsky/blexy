@@ -1,5 +1,6 @@
 from typing import List
 from blexy.devices.abstract_device import AbstractDevice
+from blexy.utils.openmetrics import OpenMetric, OpenMetricType
 
 
 class LYWSD03MMC(AbstractDevice):
@@ -44,11 +45,39 @@ class LYWSD03MMC(AbstractDevice):
             self.log.error(e)
 
     @property
-    def open_metrics(self) -> List[str]:
+    def open_metrics(self) -> List[OpenMetric]:
         output = [
-            f"temperature{self._open_metrics_labels} {self.temperature}",
-            f"humidity{self._open_metrics_labels} {self.humidity}",
-            f"voltage{self._open_metrics_labels} {self.voltage}",
-            f"battery_level{self._open_metrics_labels} {self.battery_level}",
+            # f"temperature_celsius{self._open_metrics_labels} {self.temperature}",
+            # f"humidity_percent{self._open_metrics_labels} {self.humidity}",
+            # f"voltage_volt{self._open_metrics_labels} {self.voltage}",
+            # f"battery_level_percent{self._open_metrics_labels} {self.battery_level}",
+            OpenMetric(
+                name="temperature",
+                type=OpenMetricType.gauge,
+                unit="celsius",
+                labels=self._open_metrics_labels,
+                value=self.temperature,
+            ),
+            OpenMetric(
+                name="humidity",
+                type=OpenMetricType.gauge,
+                unit="percentage",
+                labels=self._open_metrics_labels,
+                value=self.humidity,
+            ),
+            OpenMetric(
+                name="voltage",
+                type=OpenMetricType.gauge,
+                unit="volts",
+                labels=self._open_metrics_labels,
+                value=self.voltage,
+            ),
+            OpenMetric(
+                name="battery_level",
+                type=OpenMetricType.gauge,
+                unit="percentage",
+                labels=self._open_metrics_labels,
+                value=self.battery_level,
+            ),
         ]
         return output
