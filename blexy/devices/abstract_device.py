@@ -43,7 +43,6 @@ class AbstractDevice(btle.DefaultDelegate, metaclass=ABCMeta):
 
     @property
     def _open_metrics_labels(self) -> dict:
-        # return f'{{name="{self.name}",model="{self.model}",manufacturer="{self.manufacturer}",address="{self.address}",interface="{self.interface}"}}'
         return {
             "name": self.name,
             "model": self.model,

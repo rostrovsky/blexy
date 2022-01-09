@@ -47,10 +47,6 @@ class LYWSD03MMC(AbstractDevice):
     @property
     def open_metrics(self) -> List[OpenMetric]:
         output = [
-            # f"temperature_celsius{self._open_metrics_labels} {self.temperature}",
-            # f"humidity_percent{self._open_metrics_labels} {self.humidity}",
-            # f"voltage_volt{self._open_metrics_labels} {self.voltage}",
-            # f"battery_level_percent{self._open_metrics_labels} {self.battery_level}",
             OpenMetric(
                 name="temperature",
                 type=OpenMetricType.gauge,

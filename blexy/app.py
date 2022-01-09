@@ -3,6 +3,7 @@ from starlette.applications import Starlette
 from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.routing import Route
 from blexy.utils.config import GlobalConfig
+from blexy.utils.openmetrics import OpenMetricsAggregator
 
 
 async def homepage(request):
@@ -17,15 +18,14 @@ async def metrics(request):
     """
     Returns device readouts in OpenMetrics format
     """
-    out = []
+    oma = OpenMetricsAggregator()
     tasks = [d.asyncWaitForNotifications(5) for d in GlobalConfig.connected_devices()]
     results = await asyncio.gather(*tasks)
     for success, device in results:
         if success:
-            out.extend(device.open_metrics)
-    out.append("# EOF")
+            oma.add_metrics(device.open_metrics)
 
-    return PlainTextResponse("\n".join(out))
+    return PlainTextResponse(oma.text)
 
 
 app = Starlette(
