@@ -1,8 +1,10 @@
-from abc import abstractproperty
+import yaml
+import concurrent.futures
+
 from pathlib import Path
 from importlib import import_module
 from typing import List
-import yaml
+from twiggy import log
 
 from blexy.devices.abstract_device import AbstractDevice
 
@@ -12,9 +14,11 @@ class GlobalConfig:
     log_level = None
     devices = None
     _device_objects = None
+    log = log.name("GlobalConfig")
 
     @staticmethod
     def load_from_file(file_path: str) -> "GlobalConfig":
+        GlobalConfig.log.info(f"Loading config from: {file_path}")
         fp = Path(file_path)
         with open(fp, "r") as cf:
             config = yaml.load(cf, yaml.SafeLoader)
@@ -38,8 +42,10 @@ class GlobalConfig:
                 )
                 GlobalConfig._device_objects.append(device_obj)
             except Exception as e:
-                print(f'could not import device "{dev_name}" ({dev_model})')
-                print(e)
+                GlobalConfig.log.error(
+                    f'could not import device "{dev_name}" ({dev_model})'
+                )
+                GlobalConfig.log.error(e)
 
     @staticmethod
     def connected_devices() -> List[AbstractDevice]:
@@ -47,5 +53,7 @@ class GlobalConfig:
 
     @staticmethod
     def connect_all_devices():
-        for d in GlobalConfig._device_objects:
-            d.connect()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+            tasks = [executor.submit(d.connect) for d in GlobalConfig._device_objects]
+            for _ in concurrent.futures.as_completed(tasks):
+                pass

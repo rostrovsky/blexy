@@ -2,6 +2,7 @@ import click
 import uvicorn
 import blexy.app
 from blexy.utils.config import GlobalConfig
+from twiggy import quick_setup, levels
 
 
 @click.command()
@@ -16,6 +17,7 @@ def cli(port, config_file, log_level):
     GlobalConfig.load_from_file(config_file)
     app_port = port if port else GlobalConfig.port
     app_log_level = log_level if log_level else GlobalConfig.log_level
+    quick_setup(min_level=getattr(levels, app_log_level.upper()))
     GlobalConfig.connect_all_devices()
     uvicorn.run(blexy.app.app, host="0.0.0.0", port=app_port, log_level=app_log_level)
 

@@ -1,6 +1,6 @@
-from bluepy import btle
 from typing import List
 from blexy.devices.abstract_device import AbstractDevice
+from blexy.utils.openmetrics import OpenMetric, OpenMetricType
 
 
 class LYWSD03MMC(AbstractDevice):
@@ -19,20 +19,20 @@ class LYWSD03MMC(AbstractDevice):
         if self.is_connected:
             return self
 
-        print(f"Connecting {self.name} ({self.model})")
+        self.log.info("Connecting...")
         self.peripheral.connect(self.address)
         self.peripheral.writeCharacteristic(
             0x0038, b"\x01\x00", True
         )  # enable notifications of Temperature, Humidity and Battery voltage
         self.peripheral.writeCharacteristic(0x0046, b"\xf4\x01\x00", True)
         self.peripheral.withDelegate(self)
-        print(f"Connected {self.name} ({self.model})")
+        self.log.info(f"Connected")
         self.is_connected = True
         return self
 
     def handleNotification(self, cHandle, data):
         try:
-            print(f"{self.name} ({self.model}) : received {data}")
+            self.log.info(f"received data: {data.hex()}")
             self.temperature = (
                 int.from_bytes(data[0:2], byteorder="little", signed=True) / 100
             )
@@ -42,14 +42,38 @@ class LYWSD03MMC(AbstractDevice):
                 int(round((self.voltage - 2.1), 2) * 100), 100
             )  # 3.1 or above --> 100% 2.1 --> 0 %
         except Exception as e:
-            print("e")
+            self.log.error(e)
 
     @property
-    def open_metrics(self) -> List[str]:
+    def open_metrics(self) -> List[OpenMetric]:
         output = [
-            f"temperature{self._open_metrics_labels} {self.temperature}",
-            f"humidity{self._open_metrics_labels} {self.humidity}",
-            f"voltage{self._open_metrics_labels} {self.voltage}",
-            f"battery_level{self._open_metrics_labels} {self.battery_level}",
+            OpenMetric(
+                name="temperature",
+                type=OpenMetricType.gauge,
+                unit="celsius",
+                labels=self._open_metrics_labels,
+                value=self.temperature,
+            ),
+            OpenMetric(
+                name="humidity",
+                type=OpenMetricType.gauge,
+                unit="percentage",
+                labels=self._open_metrics_labels,
+                value=self.humidity,
+            ),
+            OpenMetric(
+                name="voltage",
+                type=OpenMetricType.gauge,
+                unit="volts",
+                labels=self._open_metrics_labels,
+                value=self.voltage,
+            ),
+            OpenMetric(
+                name="battery_level",
+                type=OpenMetricType.gauge,
+                unit="percentage",
+                labels=self._open_metrics_labels,
+                value=self.battery_level,
+            ),
         ]
         return output

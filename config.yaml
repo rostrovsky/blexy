@@ -5,3 +5,6 @@ ble:
     - name: living room sensor
       model: LYWSD03MMC
       address: A4:C1:38:64:49:02
+    - name: bedroom sensor
+      model: LYWSD03MMC
+      address: A4:C1:38:9B:16:5B
