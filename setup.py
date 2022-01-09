@@ -12,7 +12,7 @@ setup(
     version="0.2.0",
     url="https://github.com/rostrovsky/blexy",
     license="MIT",
-    packages=find_packages(),
+    packages=find_packages(exclude=["*test.*","*test"]),
     include_package_data=True,
     install_requires=["click", "starlette", "pyyaml", "uvicorn", "bluepy", "twiggy"],
     python_requires=">=3.7",
